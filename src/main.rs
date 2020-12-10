@@ -47,7 +47,7 @@ fn main() {
     let text_output = String::from_utf8(log_output.stdout).unwrap();
 
     let lines = text_output.lines().filter(|line| {
-        !line.is_empty() && line.contains("date") && re.is_match(line)
+        !line.is_empty() && re.is_match(line)
     });
 
     println!("{}Work log in the last {} days:", color::Fg(color::Cyan),timeframe);
