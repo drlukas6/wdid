@@ -1,6 +1,7 @@
 use structopt::StructOpt;
 use std::process::Command;
 use regex::Regex;
+use termion::color;
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "Time frame", about = "Number of days from when you want to get your log from")]
@@ -15,7 +16,7 @@ const STATUS_OK: i32 = 0;
 
 fn main() {
 
-    let opt = Opt::from_args();
+    let timeframe = Opt::from_args().timeframe;
 
     // Getting the git username from config
     let git_user_name_bytes = Command::new("git")
@@ -32,7 +33,7 @@ fn main() {
     let log_output = Command::new("git")
         .arg("log")
         .arg(format!("--author={}", git_user_name))
-        .arg(format!("--since=\"{} days ago\"", opt.timeframe))
+        .arg(format!("--since=\"{} days ago\"", timeframe))
         .arg("--format=date:%aD,message:%B")
         .output()
         .expect("Could not execute git log command");
@@ -49,13 +50,15 @@ fn main() {
         !line.is_empty() && line.contains("date") && re.is_match(line)
     });
 
-    println!("Work log in the last {} days:", opt.timeframe);
+    println!("{}Work log in the last {} days:", color::Fg(color::Cyan),timeframe);
 
     for text in lines {
 
-        println!("--------------------------------------------------------");
+        println!("{}--------------------------------------------------------", color::Fg(color::LightBlack));
         for cap in re.captures_iter(text) {
-            println!("Date: {}\t\t{}", &cap[1], &cap[2]);
+            println!("{}{}\t\t{}{}", color::Fg(color::Yellow), &cap[1], color::Fg(color::Green), &cap[2]);
         }
     }
+
+    println!("{}--------------------------------------------------------", color::Fg(color::LightBlack));
 }
