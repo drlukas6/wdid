@@ -1,6 +1,6 @@
 [package]
 name = "wdid"
-version = "0.1.0"
+version = "0.4"
 authors = ["Lukas Sestic <lukas.sestic@photomath.net>"]
 edition = "2018"
 
