@@ -18,6 +18,7 @@ fn main() {
 
     let opt = Opt::from_args();
 
+    // Getting the git username from config
     let git_user_name_bytes = Command::new("git")
         .current_dir(TEST_FOLDER)
         .arg("config")
@@ -29,26 +30,23 @@ fn main() {
     let git_user_name = String::from_utf8(git_user_name_bytes)
         .expect("Error getting a git user name");
 
-    let mut command = Command::new("git");
 
-    command.current_dir(TEST_FOLDER);
+    let log_output = Command::new("git")
+        .current_dir(TEST_FOLDER)
+        .arg("log")
+        .arg(format!("--author={}", git_user_name))
+        .arg(format!("--since=\"{} days ago\"", opt.timeframe))
+        .arg("--format=date:%aD,message:%B")
+        .output()
+        .expect("Could not execute git log command");
 
-    command.arg("log");
-    command.arg(format!("--author={}", git_user_name));
-    command.arg(format!("--since=\"{} days ago\"", opt.timeframe));
-    command.arg("--format=date:%aD,message:%B");
-
-    let output = command.output().expect("Could not execute git log command");
-
-    let stdout = output.stdout;
-
-    if output.status.code() != Option::Some(STATUS_OK) {
+    if log_output.status.code() != Option::Some(STATUS_OK) {
         eprintln!("error getting git log")
     }
 
     let re = Regex::new(r#"^date:([\w\D]+),message:([\w\D]+)$"#).unwrap();
 
-    let text_output = String::from_utf8(stdout).unwrap();
+    let text_output = String::from_utf8(log_output.stdout).unwrap();
 
     let lines = text_output.lines().filter(|line| {
         !line.is_empty() && line.contains("date") && re.is_match(line)
