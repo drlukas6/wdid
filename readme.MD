@@ -9,7 +9,7 @@ Sample usage:
 ```
 wdid -t=12
 or
-wdid -timeframe=12
+wdid --timeframe=12
 ```
 gives you a report of your last 12 days.
 
