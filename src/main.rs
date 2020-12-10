@@ -11,7 +11,6 @@ struct Opt {
     timeframe: u16
 }
 
-const TEST_FOLDER: &str = "/Users/lukassestic/Developer/Photomath";
 const STATUS_OK: i32 = 0;
 
 fn main() {
@@ -20,7 +19,6 @@ fn main() {
 
     // Getting the git username from config
     let git_user_name_bytes = Command::new("git")
-        .current_dir(TEST_FOLDER)
         .arg("config")
         .arg("user.name")
         .output()
@@ -30,9 +28,8 @@ fn main() {
     let git_user_name = String::from_utf8(git_user_name_bytes)
         .expect("Error getting a git user name");
 
-
+    // Getting the log matching te current user in the given timeframe
     let log_output = Command::new("git")
-        .current_dir(TEST_FOLDER)
         .arg("log")
         .arg(format!("--author={}", git_user_name))
         .arg(format!("--since=\"{} days ago\"", opt.timeframe))
